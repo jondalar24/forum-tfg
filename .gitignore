@@ -193,3 +193,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 0e40b224cb1f7f4a94dca8144d7aa6017056a5cf
+node_modules/
