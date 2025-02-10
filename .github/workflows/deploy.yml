@@ -1,0 +1,49 @@
+name: Deploy
+run-name: Deploy commit "${{ github.event.head_commit.message }}"
+
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Run deploy script via ssh
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USERNAME }}
+          password: ${{ secrets.PROD_SSH_PASSWORD }}
+          script: |
+            cd /forum123
+            docker compose -f envs/prod/docker-compose.yml down
+
+            # following steps allow us to get the last version of a branch even if it was force pushed
+            git fetch origin develop
+            git checkout -b tmp-branch
+            git branch -D develop
+            git checkout develop
+            git branch -D tmp-branch
+
+            docker compose -f envs/prod/docker-compose.yml up --build --detach
+
+  deploy-badge:
+    name: Deploy badge
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [deploy]
+    steps:
+      - name: Create deploy badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.FORUM123_BADGES_GIST_SECRET }}
+          gistID: daf93d417057585c270ed982ea89fa5d
+          filename: deploy.json
+          label: deploy
+          message: ${{ needs.deploy.result == 'success' && 'passing' || 'failure' }}
+          color: ${{ needs.deploy.result == 'success' && '#238636' || '#6b2a2b' }}

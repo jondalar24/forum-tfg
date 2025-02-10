@@ -1,0 +1,133 @@
+name: Lint
+run-name: Lint commit "${{ github.event.head_commit.message }}"
+
+on: push
+jobs:
+  mypy:
+    name: Mypy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Cache Docker layers
+        uses: ./.github/actions/docker/use-buildx-cache
+
+      - name: Cache mypy
+        uses: actions/cache@v3
+        with:
+          path: ./.mypy_cache
+          key: mypy-${{ runner.os }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            mypy-${{ runner.os }}-${{ github.ref_name }}
+            mypy-${{ runner.os }}-${{ github.event.repository.default_branch }}
+
+      - name: Build mypy
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env build forum123-mypy
+
+      - name: Run mypy
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env run forum123-mypy
+
+      - name: Update buildx cache
+        uses: ./.github/actions/docker/update-buildx-cache
+
+  mypy-badge:
+    name: Mypy badge
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [mypy]
+    steps:
+      - name: Create mypy badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.FORUM123_BADGES_GIST_SECRET }}
+          gistID: daf93d417057585c270ed982ea89fa5d
+          filename: mypy.json
+          label: mypy
+          message: ${{ needs.mypy.result == 'success' && 'passing' || 'failure' }}
+          color: ${{ needs.mypy.result == 'success' && '#238636' || '#6b2a2b' }}
+
+  flake8:
+    name: Flake8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Cache Docker layers
+        uses: ./.github/actions/docker/use-buildx-cache
+
+      - name: Build flake8
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env build forum123-flake8
+
+      - name: Run flake8
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env run forum123-flake8
+
+      - name: Update buildx cache
+        uses: ./.github/actions/docker/update-buildx-cache
+
+  flake8-badge:
+    name: Flake8 badge
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [flake8]
+    steps:
+      - name: Create flake8 badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.FORUM123_BADGES_GIST_SECRET }}
+          gistID: daf93d417057585c270ed982ea89fa5d
+          filename: flake8.json
+          label: flake8
+          message: ${{ needs.flake8.result == 'success' && 'passing' || 'failure' }}
+          color: ${{ needs.flake8.result == 'success' && '#238636' || '#6b2a2b' }}
+
+  pylint:
+    name: Pylint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Cache Docker layers
+        uses: ./.github/actions/docker/use-buildx-cache
+
+      - name: Build pylint
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env build forum123-pylint
+
+      - name: Run pylint
+        run: docker compose -f envs/ci/docker-compose.yml --env-file envs/ci/.env run forum123-pylint
+
+      - name: Update buildx cache
+        uses: ./.github/actions/docker/update-buildx-cache
+
+  pylint-badge:
+    name: Pylint badge
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [pylint]
+    steps:
+      - name: Create pylint badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.FORUM123_BADGES_GIST_SECRET }}
+          gistID: daf93d417057585c270ed982ea89fa5d
+          filename: pylint.json
+          label: pylint
+          message: ${{ needs.pylint.result == 'success' && 'passing' || 'failure' }}
+          color: ${{ needs.pylint.result == 'success' && '#238636' || '#6b2a2b' }}
+
+  branch:
+    name: Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out whole repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # fetch all history for all branches and tags
+
+      - name: Lint branch
+        env:
+          GITHUB_CURRENT_BRANCH: ${{ github.ref_name }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python envs/ci/scripts/branches/lint.py

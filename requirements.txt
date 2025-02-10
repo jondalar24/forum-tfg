@@ -1,21 +1,22 @@
 # Project dependencies. Please keep this list in alphabetical order.
 
-alembic[tz]==1.9.1
-chromadb==0.3.25
-flask==2.2.2
-flask-restx==1.1.0
-flask-WTF==1.0.1
-huggingface-hub==0.16.4
-ibm-watson-machine-learning  # Para el acceso a Watsonx
-langchain==0.0.254
-numpy==1.21.6
-pyjwt==2.6.0
-python-dotenv==0.21.0
-psycopg2-binary==2.9.5
-requests==2.31.0
-sentence-transformers==2.2.2
-sqlalchemy==1.4.46
-torch==2.0.1
-transformers==4.44.0
-Werkzeug==2.2.2
-wtforms==3.0.1
+alembic[tz]==1.9.1              # Para gestionar migraciones
+bcrypt==3.2.2                   # Para hashing de contraseñas
+chromadb==0.3.25                # Almacenamiento vectorial para embeddings
+flask==2.2.2                    # Framework principal
+flask-restx==1.1.0              # Extensión para APIs RESTful
+flask-WTF==1.0.1                # Formularios con validación
+huggingface-hub==0.16.4         # Para cargar modelos de HuggingFace
+ibm-watson-machine-learning==1.0.367
+langchain==0.0.254              # Herramientas para cadenas de consulta
+numpy==1.22.4                   # Operaciones numéricas
+psycopg2-binary==2.9.5          # Conector para PostgreSQL
+pyjwt==2.6.0                    # Para JSON Web Tokens
+python-dotenv==0.21.0           # Gestión de variables de entorno
+requests==2.31.0                # Para realizar peticiones HTTP
+sentence-transformers==2.2.2    # Embeddings para IA
+sqlalchemy==1.4.46              # ORM principal
+torch==2.0.1                    # Framework de aprendizaje profundo
+transformers==4.30.2            # Modelos preentrenados de HuggingFace
+Werkzeug==2.2.2                 # Servidor WSGI
+wtforms==3.0.1                  # Manejo de formularios
