@@ -1,68 +1,114 @@
-# Forum123 backend
-
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/birthdaysgift/daf93d417057585c270ed982ea89fa5d/raw/mypy.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/birthdaysgift/daf93d417057585c270ed982ea89fa5d/raw/flake8.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/birthdaysgift/daf93d417057585c270ed982ea89fa5d/raw/pylint.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/birthdaysgift/daf93d417057585c270ed982ea89fa5d/raw/deploy.json)
-
-## Development setup
-
-__This project requires Python 3.10, Docker, Docker Compose.__
+#  Forum-TFG: AI-Enhanced Academic Forum
 
 
 
-### First time setup
-
-If this is your first run of this project you need to create and activate python virtual environment.
-You can do it in the way you are more familiar with but here is an example of how it can be done:
-
-1. Go to the project root directory.
-2. Create virtual environment: `python3.10 -m venv .venv/forum123`
-3. Activate virtual environment: `source .venv/forum123/bin/activate`
-4. Install dependencies: `pip install -r requirements.txt -r requirements-dev.txt`
-
-_Note_: If you've created a virtual environment inside project directory
-and don't want it to be tracked by git, please do not add it to `.gitignore` file.
-There are other ways to do it correctly - choose any of these or find your own:
-
-- Add virtual environment directory to `.git/info/exclude` file of this repository.
-- Add local `.gitignore` file to the directory of your virtual env and put `*` inside this file.
 
 
 
-### Run linters
 
-1. Go to the project root directory.
-2. Activate python virtual environment.
-3. Run `mypy`
-4. Run `flake8`
-5. Run `pylint src tests`
+## 📌 About the Project
 
-Linters order above is the preffered way to run and fix them one by one.
+Forum-TFG is an AI-enhanced academic discussion forum designed for students and teachers. This project started as a fork of fenya123/forum123, but has been significantly modified to integrate AI capabilities, enhance user interaction, and improve system architecture.
+
+The forum allows:
+
+* Students to post questions and discuss topics.
+
+* Teachers to answer and validate responses.
+
+* AI assistance to guide students using Hugging Face Transformers and IBM Watsonx.
+
+* Role-based access control (students & teachers).
+
+### 🚀 Features
+
+* ✅ Flask-based Web Application for handling user authentication, topics, and posts.
+* ✅ PostgreSQL Database for efficient storage and management of discussions.
+* ✅ AI Integration using Hugging Face Sentence Transformers & IBM WatsonxLLM.
+* ✅ RESTful API for managing users, topics, and AI-assisted queries.
+* ✅ Dockerized Environment for easy deployment and development.
+* ✅ Tailwind CSS for a modern and responsive UI.
+* ✅ User roles (Student & Teacher) with role-based access.
+
+### 🛠️ System Requirements
+
+* Python 3.10
+* PostgreSQL (Dockerized instance recommended)
+* Docker & Docker Compose
+* Node.js & npm (for Tailwind CSS)
+* Flask, SQLAlchemy, Alembic (for backend management)
+
+### ⚙️ Installation & Setup
+
+- 1️⃣ Clone the Repository
+
+$ git clone https://github.com/jondalar24/forum-tfg.git
+$ cd forum-tfg
+
+- 2️⃣ Set Up a Virtual Environment
+
+$ python3.10 -m venv .venv/forum-tfg
+$ source .venv/forum-tfg/bin/activate
+
+- 3️⃣ Install Dependencies
+
+$ pip install -r requirements.txt -r requirements-dev.txt
+$ npm install
+
+- 4️⃣ Database Setup
+
+$ docker-compose -f envs/dev/docker-compose.yml up --detach
+$ alembic upgrade head  # Apply latest migrations
+
+- 5️⃣ Run the Application
+
+$ flask run
+
+The server will be available at http://127.0.0.1:5000
+
+### 🧑‍💻 API Endpoints
+
+| Método  | Endpoint            | Descripción                           |
+|---------|---------------------|---------------------------------------|
+| `GET`   | `/api/topics`       | Obtiene todos los temas del foro.    |
+| `POST`  | `/api/topics`       | Crea un nuevo tema.                  |
+| `GET`   | `/api/topics/{id}`  | Obtiene un tema por su ID.           |
+| `PUT`   | `/api/topics/{id}`  | Actualiza un tema existente.         |
+| `DELETE`| `/api/topics/{id}`  | Elimina un tema.                     |
+| `GET`   | `/api/posts`        | Obtiene todas las publicaciones.     |
+| `POST`  | `/api/posts`        | Crea una nueva publicación.          |
+| `GET`   | `/api/posts/{id}`   | Obtiene una publicación por ID.      |
+| `DELETE`| `/api/posts/{id}`   | Elimina una publicación.             |
+| `POST`  | `/api/ia/ask`       | Envia una pregunta a la IA y obtiene respuesta. |
 
 
+### 🛠 Running Tests
 
-### Run application
+To run unit tests:
+```bash
+$ pytest --cov=src
+```
+To check code quality:
+```bash
+$ flake8
+$ pylint src
+$ mypy src
+```
 
-1. Open terminal.
-2. Run services using `docker-compose -f envs/dev/docker-compose.yml up --detach` command.
-3. Apply recent migrations if you haven't done it yet using `alembic upgrade head` command.
-4. Type `flask run` command in terminal.
-5. Open http://127.0.0.1:5000 in your internet browser.
+### 📜 License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+### 🙌 Credits & Acknowledgements
+
+Based on the original forum123 by fenya123
+
+AI functionality integrated using Hugging Face and IBM Watsonx
+
+UI enhancements using Tailwind CSS
+
+### 🏗️ How to Contribute
+
+Feel free to fork the repository and submit pull requests! If you find any issues, please open an issue.
 
 
-### Run tests
-
-1. Open terminal
-2. Run services using `docker-compose -f envs/test/docker-compose.yml up --detach` command.
-3. Type `pytest` command in terminal.
-   If you want to check coverage, run `pytest --cov=src`. This command also creates `htmlcov/index.html` file,
-
-
-### Working with migrations
-
-- Autogenerate migrations by typing command `alembic revision --autogenerate -m "<your message>"`.
-- To apply migrations, use `alembic upgrade <revision>` if you want to have a certain revision
-    or `alembic upgrade head` if you want to apply all available migrations.
-- To revert migrations, use `alembic downgrade <revision>`
-    or `alembic downgrade -1` to revert last migration.
